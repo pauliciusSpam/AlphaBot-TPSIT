@@ -1,22 +1,42 @@
 import socket
 import AlphaBot
 import time
-from p5 import *
 
-def key_pressed():
-    if key == "w":
-        larry.forward()
-    elif key == "a":
-        larry.left()
-    elif key == "s":
-        larry.backward()
-    elif key == "d":
-        larry.right()
+def gestisci(c):
+    destro, sinistro = larry.getSensor()
+
+    if destro != 0 and sinistro != 0:
+        if c == "w":
+                larry.forward()
+
+        elif c == "a":
+            larry.left()
+
+        elif c == "s":
+            larry.backward()
+
+        elif c == "d":
+            larry.right()
+
+        elif c == "stop":
+            larry.stop()
+            
+        elif c == "finish":
+            s.close()
+            connection.close()
+
+        elif c.startswith("DB"):
+            comando = c.replace("DB", "")
+            if comando == "forward":
+                larry.forward()
+            elif comando == "left":
+                larry.left()
+            elif comando == "backward":
+                larry.backward()
+            elif comando == "right":
+                larry.right()
+                
     else:
-        print("Istruzione non valida.")
-
-def key_released():
-    if key == "w" or key == "a" or key == "s" or key =="d":
         larry.stop()
 
 ADDRESS = ("0.0.0.0", 5000) # 0.0.0.0: Indirizzo IP speciale, anche detto "This host"
@@ -32,17 +52,12 @@ larry.stop()
 s.bind(ADDRESS)
 
 print("In attesa di connessioni: ")
-n = 5
 s.listen(NUMERO_CONNESSIONI) # Aspetta connessioni
 connection, device_address = s.accept()
-for _ in range(n):
+
+while True:
     data = connection.recv(BUFFER)
     istruzione = data.decode()
-    print("Comando ricevuto: " + istruzione)
+    print(f"Key: {istruzione}")
 
-    """data2 = connection.recv(BUFFER)
-    tempo = int(data.decode())
-    print("Tempo ricevuto" + tempo)"""
-
-s.close()
-connection.close()
+    gestisci(istruzione)

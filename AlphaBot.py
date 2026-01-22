@@ -1,6 +1,9 @@
 import RPi.GPIO as GPIO
 import time
 
+DR = 16
+DL = 19
+
 class AlphaBot(object):
 	
 	def __init__(self,in1=12,in2=13,ena=6,in3=20,in4=21,enb=26):
@@ -19,6 +22,9 @@ class AlphaBot(object):
 		GPIO.setup(self.IN4,GPIO.OUT)
 		GPIO.setup(self.ENA,GPIO.OUT)
 		GPIO.setup(self.ENB,GPIO.OUT)
+		GPIO.setup(DR, GPIO.IN, GPIO.PUD_UP) 
+		GPIO.setup(DL, GPIO.IN, GPIO.PUD_UP)
+
 		self.forward()
 		self.PWMA = GPIO.PWM(self.ENA,500)
 		self.PWMB = GPIO.PWM(self.ENB,500)
@@ -60,7 +66,27 @@ class AlphaBot(object):
 
 	def setPWMB(self,value):
 		self.PWMB.ChangeDutyCycle(value)	
-		
+	
+	def forward_time(self, secondi):
+		self.forward()
+		time.sleep(secondi)
+		self.stop()
+	
+	def left_time(self, secondi):
+		self.left()
+		time.sleep(secondi)
+		self.stop()
+
+	def backward_time(self, secondi):
+		self.backward()
+		time.sleep(secondi)
+		self.stop()
+	
+	def right_time(self, secondi):
+		self.right()
+		time.sleep(secondi)
+		self.stop()
+
 	def setMotor(self, left, right):
 		if((right >= 0) and (right <= 100)):
 			GPIO.output(self.IN1,GPIO.HIGH)
@@ -78,5 +104,12 @@ class AlphaBot(object):
 			GPIO.output(self.IN3,GPIO.LOW)
 			GPIO.output(self.IN4,GPIO.HIGH)
 			self.PWMB.ChangeDutyCycle(0 - left)
+	
+	def getSensor(self):
+		DR_status = GPIO.input(DR)
+		DL_status = GPIO.input(DL)
+
+		return DR_status, DL_status
 
 	
+
